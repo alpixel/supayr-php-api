@@ -1,12 +1,12 @@
 {
-    "name": "imageo/imageo-php",
-    "description": "[API] Simple PHP wrapper for the Imageo API",
-    "keywords": ["imageo", "api", "php", "qrcode"],
+    "name": "alpixel/supayr-php-api",
+    "description": "Simple PHP wrapper for the supayr API",
+    "keywords": ["supayr", "api", "php", "qrcode"],
     "homepage": "",
     "license": "MIT",
     "authors": [
         {
-            "name": "Imageo",
+            "name": "Supayr",
             "email": "sysadmin@alpixel.fr",
             "homepage": ""
         }
@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Imageo": "src/"
+            "Supayr": "src/"
         }
     }
 }
