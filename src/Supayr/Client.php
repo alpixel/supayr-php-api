@@ -2,11 +2,13 @@
 
 namespace Supayr;
 
+use GuzzleHttp\Exception\ClientException;
+
 
 class Client extends \GuzzleHttp\Client
 {
     const API_VERSION = "1.0";
-    const API_URL     = "http://alpixel-devbox/app_dev.php/api/";
+    const API_URL     = "http://alpixel-devbox/app_dev.php/api";
 
     protected $username;
     protected $apiKey;
@@ -17,40 +19,55 @@ class Client extends \GuzzleHttp\Client
      */
     public function __construct($username, $key)
     {
+        $this->username = $username;
+        $this->apiKey   = $key;
         parent::__construct(['defaults' => [
             'headers' => [
                 'user-agent' => 'supayr-php-api/' . phpversion() . '/' . self::API_VERSION
             ]
-        );
-        $this->username = $username;
-        $this->apiKey   = $key;
+        ]]);
     }
 
+    /**
+     * @param string  $folderToken  Your given token on supayr.com
+     */
     public function requestInstance($folderToken)
     {
+        return $this->_call('GET', 'instance/new', [
+            'username' => $this->username,
+            'api_key'  => $this->apiKey,
+            'token'    => $folderToken,
+        ]);
     }
 
-    public function call()
+    /**
+     * @param string  $folderToken  Your given token on supayr.com
+     */
+    public function download($instanceToken)
     {
-        $response = null;
-        if ($call) {
-            try {
-                $response = call_user_func_array(
-                    array($this, strtolower($this->method)), [
-                    $this->url, [
-                            'headers'  => ['content-type' => $this->type],
-                            'query' => $this->filters,
-                            'json' => $this->body,
-                            'auth' => $this->auth
-                        ]
-                    ]
-                );
-            }
-            catch (\GuzzleHttp\Exception\ClientException $e) {
-                $response = $e->getResponse();
-            }
-        }
+        return $this->_call('GET', 'download', [
+            'username' => $this->username,
+            'api_key'  => $this->apiKey,
+            'token'    => $instanceToken,
+        ]);
+    }
 
-        return [];
+    protected function _call($method, $query, $params)
+    {
+        try {
+            $callURL = self::API_URL.'/'.$query;
+            $call    = $this->send($this->createRequest(strtolower($method), $callURL, [
+                'query' => $params
+            ]));
+
+            $response = [
+                'statusCode' => $call->getStatusCode(),
+                'data'       => $call->json(),
+            ];
+        }
+        catch (ClientException $e) {
+            $response = $e->getResponse();
+        }
+        return $response;
     }
 }
